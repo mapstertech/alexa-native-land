@@ -1,0 +1,23 @@
+{
+  "name": "native-land",
+  "version": "1.0.0",
+  "description": "Mapster-Native-Land-Alexa",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "alexa",
+    "amazon",
+    "echo",
+    "native-land",
+    "Mapster",
+    "maps"
+  ],
+  "author": "Mapster",
+  "license": "ISC",
+  "dependencies": {
+    "ask-sdk": "^2.0.3",
+    "axios": "^0.18.0"
+  }
+}
