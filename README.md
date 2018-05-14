@@ -16,6 +16,7 @@ _Serving as a guide to creating a first Alexa skill_
   - Handle default Alexa "intents"
   - Custom intent `HelloWorldIntent`
 - Writing the Native Land custom code
+  - Requesting device address
   - Async code
   - Building custom speech responses
   - `WhoseLandIntent`
