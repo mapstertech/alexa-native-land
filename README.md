@@ -64,6 +64,7 @@ When you have decided, remember to click save at the top of the console area.
 
 Intents are what Alexa uses to determine what to do after you invoke a skill.
 > "Alexa, ask `Mapster Tutorial` to say hello world"
+
 In this example, the `intent` is `say hello world`
 
 Let's configure our first intent.
