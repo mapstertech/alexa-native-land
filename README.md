@@ -186,7 +186,6 @@ const messages = {
     WHAT_DO_YOU_WANT: 'Did you say something? I couldn\'t hear you.',
     HELP: 'You can use this skill by asking me to say hello world.',
     GOODBYE: 'Bye! Thanks for using the Mapster Tutorial Skill!',
-
 }
 
 const LaunchRequestHandler = {
@@ -262,3 +261,57 @@ exports.handler = Alexa.SkillBuilders.custom()
     ).lambda();
 
 ```
+
+#### We're almost there!
+
+Add this code after the last handler, `SessionEndedRequestHandler`
+
+```
+const HelloWorldHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'HelloWorldIntent';
+    },
+    handle(handlerInput) {
+        const speechText = 'Hello, World!';
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withSimpleCard('Native Land', speechText)
+            .getResponse();
+    }
+};
+```
+
+>`handlerInput.requestEnvelope.request.type` must match what you named your intent in the Alexa Skills Console.
+
+### Lamdba function
+
+We need to upload our code to the lamdba function.
+
+Zip all the files inside your directory, including `node_modules`. Do not zip the directory itself.
+
+*SS*
+
+Head back to your Lambda function to upload your zipped file.
+
+**SS**
+
+Leave index.handler as the Handler field.
+> The module-name.export value in your function. For example, "index.handler" would call exports.handler in index.js.
+
+**SAVE**
+
+### Alexa skills kit console
+
+This is it!
+
+Go back to the ASK console and click on **Build Model**. This will take a minute or two.
+
+*SS*
+
+After it builds, you can enter the Alexa Simulator by clicking **Test**. Be sure to enable testing for this skill.
+
+**SS**
+
+Click and hold on the mic and start speaking!!
+
