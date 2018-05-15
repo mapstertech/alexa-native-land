@@ -114,5 +114,151 @@ We will need permission to:
 *SS*
 
 # Lambda function
-Head back to the
+Head back to the [AWS management console](https://aws.amazon.com/console/) and create a new lamda function. You may have to search for Lambda and click on the link
 
+*SS*
+
+In the Lambda management console click `Create function`
+
+*SS*
+
+1. Select `Author from scratch`
+2. Name your function
+3. Select Node.js 8.10 as the runtime
+4. Role
+    - Select **Create new role from template**
+    - Enter the role name
+    - From the **Policy templates** list, select **Simple Microservice Permissions**
+5. Click `Create function`
+
+On the next page you'll add the ASK trigger to your lambda function, this is a verification process that ensures only your skills communicate with your function.
+1. In the **Designer** menu select the **Alexa Skills Kit** tab
+2. Scroll down and paste the tiny Alexa skill key you copied into the `Skill ID` field
+3. Click **Add** in the bottom right corner.
+4. **Click `Save` in the top right corner of the page**
+
+Now we need to configure our Alexa Skill with the lambda function ID.
+
+It's really easy to find, at the top right corner of the page.
+
+*SS*
+
+## Alexa console
+Head back to the [Alexa skills console](https://developer.amazon.com/alexa/console/ask)
+
+1. Select the **Endpoint** tab in the left side menu
+2. Paste the lamda function ID into the default region field
+
+*SS*
+
+3. **SAVE**
+
+# Coding!
+
+Yes, we can actually write some code now.
+
+In a new directory:
+```
+touch index.js
+npm init -y
+npm install ask-sdk axios
+```
+
+### Default intent handlers
+
+There are four default intents every alexa skill must be able to respond to.
+
+1. `FallbackIntent`
+2. `CancelIntent`
+3. `HelpIntent`
+4. `StopIntent`
+
+We need to handle these intents before we can write our own code
+
+```
+/* index.js */
+
+const Alexa = require('ask-sdk');
+const axios = require('axios');
+
+const messages = {
+    WELCOME: 'Welcome to the Mapster alexa tutorial, ask me to say hi or to hello world.',
+    WHAT_DO_YOU_WANT: 'Did you say something? I couldn\'t hear you.',
+    HELP: 'You can use this skill by asking me to say hello world.',
+    GOODBYE: 'Bye! Thanks for using the Mapster Tutorial Skill!',
+
+}
+
+const LaunchRequestHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+    },
+    handle(handlerInput) {
+        let speechText = messages.WELCOME;
+        let repromptText = messages.WHAT_DO_YOU_WANT;
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(repromptText)
+            .withSimpleCard('Mapster Tutorial', speechText)
+            .getResponse();
+    }
+};
+
+const HelpIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+            handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
+    },
+    handle(handlerInput) {
+        const speechText = messages.HELP;
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .withSimpleCard('Mapster Tutorial', speechText)
+            .getResponse();
+    }
+};
+
+const CancelAndStopIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
+                || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+    },
+    handle(handlerInput) {
+        const speechText = messages.GOODBYE;
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withSimpleCard('Mapster Tutorial', speechText)
+            .getResponse();
+    }
+};
+
+const SessionEndedRequestHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+    },
+    handle(handlerInput) {
+        // any cleanup logic goes here
+        const err = handlerInput.requestEnvelope.request.error
+
+        if (err) {
+            console.log('ERROR', err);
+        }
+
+        return handlerInput.responseBuilder.getResponse();
+    }
+};
+
+exports.handler = Alexa.SkillBuilders.custom()
+    .addRequestHandlers(
+        LaunchRequestHandler,
+        HelpIntentHandler,
+        CancelAndStopIntentHandler,
+        SessionEndedRequestHandler
+    ).lambda();
+
+```
