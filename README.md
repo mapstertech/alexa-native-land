@@ -278,7 +278,7 @@ const HelloWorldHandler = {
 
 `handlerInput.requestEnvelope.request.type` must match what you named your intent in the Alexa Skills Console.
 
-NOTE:
+### NOTE:
 
 Putting `console.log()` statements in your `index.js` will output to the **AWS Cloudwatch** service.
 
