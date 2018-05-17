@@ -40,11 +40,12 @@ Give your skill a name.
 
 On the next page select `Custom` and click `Create skill`
 
-*screenshot here*
+![create custom skill](./screenshots/create-custom-skill.png)
 
 # Alexa Skills Kit developer console
 Welcome to the ASK dev console, you will spend a lot of time here.
-*SS*
+
+![create custom skill](./screenshots/ask-dev-console.png)
 
 This is where you configure the permisions your Alexa skill requires, build the app for the Alexa skills library, and configure `Intents`.
 
@@ -60,7 +61,7 @@ Or
 On the left menu bar click on `Invocation` and enter the words you will say to invoke your skill.
 When you have decided, remember to click save at the top of the console area.
 
-*SS*
+![configure invocation](./screenshots/configure-invocation.png)
 
 ### Intents & Utterances
 
@@ -97,26 +98,23 @@ We will need permission to:
 
 >Device Address: Country & Postal Code Only
 
-*SS*
+![configure country and postal code](./screenshots/configure-permissions-country-and-postal-code.png)
 
 ### Next steps
 1. Save the model!! *VERY IMPORTANT*. You will lose your changes if you do not save.
 
-*SS*
 
 2. Go back to the `Alexa Skills Console` and copy the ridculously small Alexa skill key.
     - This is a unique device key, and your Lambda function requires it as a config
 
-*SS*
+![tiny alexa skill key](./screenshots/ask-alexa-skill-id.png)
 
 # Lambda function
 Head back to the [AWS management console](https://aws.amazon.com/console/) and create a new lamda function. You may have to search for Lambda and click on the link
 
-*SS*
+![search for lambda function](./screenshots/search-for-lambda-function.png)
 
 In the Lambda management console click `Create function`
-
-*SS*
 
 1. Select **Author from scratch**
 2. Name your function
@@ -137,7 +135,7 @@ Now we need to configure our Alexa Skill with the lambda function ID.
 
 It's really easy to find, at the top right corner of the page.
 
-*SS*
+![lambda function id](./screenshots/console-lambda-function-id.png)
 
 ## Alexa console
 Head back to the [Alexa skills console](https://developer.amazon.com/alexa/console/ask)
@@ -145,7 +143,7 @@ Head back to the [Alexa skills console](https://developer.amazon.com/alexa/conso
 1. Select the **Endpoint** tab in the left side menu
 2. Paste the lamda function ID into the default region field
 
-*SS*
+![ask endpoint lambda function id](./screenshots/ask-endpoint-lambda-function-id.png)
 
 3. **SAVE**
 
@@ -280,17 +278,29 @@ const HelloWorldHandler = {
 
 `handlerInput.requestEnvelope.request.type` must match what you named your intent in the Alexa Skills Console.
 
+NOTE:
+
+Putting `console.log()` statements in your `index.js` will output to the **AWS Cloudwatch** service.
+
+The quickest way to access your function's logs are by going to the **Monitoring** tab and clicking on any of the **jump to logs** links.
+
+![jump to logs](./screenshots/jump-to-logs.png)
+
+#### Alternatively
+
+You can access **Cloudwatch** from the AWS console by searching for it and then navigating to the **Logs** menu on the left hand side.
+
 ### Lamdba function
 
 We need to upload our code to the lamdba function.
 
 Zip all the files inside the directory, including `node_modules`. Do not zip the directory itself.
 
-*SS*
+![compress items](./screenshots/compress-items.png)
 
 Head back to your Lambda function to upload your zipped file.
 
-*SS*
+![upload zip](./screenshots/upload-zip.png)
 
 Leave index.handler as the Handler field.
 - The module-name.export value in your function. For example, "index.handler" would call exports.handler in index.js.
@@ -301,13 +311,19 @@ Leave index.handler as the Handler field.
 
 This is it!
 
-Go back to the ASK console and click on **Build Model**. This will take a minute or two.
-
-*SS*
+Go back to the ASK console, **save**, then **Build Model**. This will take a minute or two.
 
 After it builds, you can enter the Alexa Simulator by clicking **Test**. Be sure to enable testing for this skill.
 
-*SS*
+![enable testing](./screenshots/ask-enable-testing.png)
 
 Click and hold on the mic and start speaking!!
+
+You can experiment and explore the simulated devices logs, by checking the **Device Logs** box.
+
+When you are testing on a device, this interface and the lambda function's log reporting are the two primary debugging interfaces.
+
+# In progress...
+
+Native land specific code and screenshots
 
