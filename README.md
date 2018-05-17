@@ -31,14 +31,10 @@ You will need to create several developer accounts:
 
 Head to the [Alexa skills kit](https://developer.amazon.com/alexa-skills-kit/) and click on `Start a Skill`
 
-*screenshot here*
-
 You are now in the ASK (Alexa skills kit) developer console.
 Here you can view, manage, update, delete, and create your Alexa skills.
 
 Create a new skill by clicking `Create Skill`
-
-*screenshot here*
 
 Give your skill a name.
 
@@ -69,12 +65,12 @@ When you have decided, remember to click save at the top of the console area.
 ### Intents & Utterances
 
 Intents are what Alexa uses to determine what to do after you invoke a skill.
-> "Alexa, ask `Mapster Tutorial` to say hello world"
+> "Alexa, ask **Mapster Tutorial** to say hello world"
 
 Utterances are words or a phrase a user might say to launch a specific intent
 - Alexa listens for `Utterances` after the `Invocation` to determine what to do (What is your intent?)
 
-> "Alexa, ask Mapster Tutorial to `say hello world`"
+> "Alexa, ask **Mapster Tutorial** to **say hello world**"
 
 In this example, the `intent` is `HelloWorldIntent` and the `utterance` is `say hello world`.
 - In our "Alexa code" we will set up a listener for HelloWorldIntent to handle this intent i.e. send back "Hello, world."
@@ -122,18 +118,18 @@ In the Lambda management console click `Create function`
 
 *SS*
 
-1. Select `Author from scratch`
+1. Select **Author from scratch**
 2. Name your function
 3. Select Node.js 8.10 as the runtime
 4. Role
     - Select **Create new role from template**
     - Enter the role name
     - From the **Policy templates** list, select **Simple Microservice Permissions**
-5. Click `Create function`
+5. Click **Create function**
 
 On the next page you'll add the ASK trigger to your lambda function, this is a verification process that ensures only your skills communicate with your function.
 1. In the **Designer** menu select the **Alexa Skills Kit** tab
-2. Scroll down and paste the tiny Alexa skill key you copied into the `Skill ID` field
+2. Scroll down and paste the tiny Alexa skill key you copied into the **Skill ID** field
 3. Click **Add** in the bottom right corner.
 4. **Click `Save` in the top right corner of the page**
 
@@ -282,22 +278,22 @@ const HelloWorldHandler = {
 };
 ```
 
->`handlerInput.requestEnvelope.request.type` must match what you named your intent in the Alexa Skills Console.
+`handlerInput.requestEnvelope.request.type` must match what you named your intent in the Alexa Skills Console.
 
 ### Lamdba function
 
 We need to upload our code to the lamdba function.
 
-Zip all the files inside your directory, including `node_modules`. Do not zip the directory itself.
+Zip all the files inside the directory, including `node_modules`. Do not zip the directory itself.
 
 *SS*
 
 Head back to your Lambda function to upload your zipped file.
 
-**SS**
+*SS*
 
 Leave index.handler as the Handler field.
-> The module-name.export value in your function. For example, "index.handler" would call exports.handler in index.js.
+- The module-name.export value in your function. For example, "index.handler" would call exports.handler in index.js.
 
 **SAVE**
 
@@ -311,7 +307,7 @@ Go back to the ASK console and click on **Build Model**. This will take a minute
 
 After it builds, you can enter the Alexa Simulator by clicking **Test**. Be sure to enable testing for this skill.
 
-**SS**
+*SS*
 
 Click and hold on the mic and start speaking!!
 
