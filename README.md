@@ -114,6 +114,8 @@ Head back to the [AWS management console](https://aws.amazon.com/console/) and c
 
 ![search for lambda function](./screenshots/search-for-lambda-function.png)
 
+Click the region drop-down in the upper-right corner of the console and select one of the regions supported for Alexa skills: Asia Pacific (Tokyo), EU (Ireland), US East (N. Virginia), or US West (Oregon).
+
 In the Lambda management console click `Create function`
 
 1. Select **Author from scratch**
