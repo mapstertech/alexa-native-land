@@ -16,7 +16,50 @@ const messages = {
     STOP: 'Bye! Thanks for using the Sample Device Address API Skill!',
 };
 
+const IPA = {
+    musqueam: 'xʷməθkʷəjˀəm',
+    tsleil_waututh: 'səl’ilwətaɁɬ',
+    squamish: '/ˈskwɔːmɪʃ/'
+};
+
 const PERMISSIONS = ['read::alexa:device:all:address:country_and_postal_code'];
+
+const buildSSML = nlData => {
+    let SSML;
+
+    const names = nlData.map(nation => {
+        if (IPA[nation.properties.Name]) {
+            return IPA[nation.properties.Name];
+        }
+    });
+
+    const last = names.pop();
+    const nameString = names.join(', ');
+
+    let LAND_MESSAGE = `You are on the lands of the ${nameString}, and the ${last}.`;
+
+    return SSML;
+}
+
+const SSSMLIntentHandler = {
+    canHandle(handlerInput) {
+        const {
+            request
+        } = handlerInput.requestEnvelope;
+
+        return request.type === 'IntentRequest' && request.intent.name === 'SSMLIntent';
+    },
+    handle(handlerInput) {
+        const SPEECH =
+            `<speak>
+                You are on the land of the <phoneme alphabet="ipa" ph="${IPA.squamish}">Squamish</phoneme>
+            </speak>`;
+
+        return handlerInput.responseBuilder
+            .speak(SPEECH)
+            .getResponse();
+    }
+}
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -34,15 +77,21 @@ const LaunchRequestHandler = {
 const WhoseLandAmIOnIntentHandler = {
     canHandle(handlerInput) {
         console.log('handlerInput', handlerInput)
-        const { request } = handlerInput.requestEnvelope;
+        const {
+            request
+        } = handlerInput.requestEnvelope;
 
         return request.type === 'IntentRequest' && request.intent.name === 'WhoseLandIntent';
     },
     async handle(handlerInput) {
-        const { requestEnvelope, serviceClientFactory, responseBuilder } = handlerInput;
+        const {
+            requestEnvelope,
+            serviceClientFactory,
+            responseBuilder
+        } = handlerInput;
 
-        const consentToken = requestEnvelope.context.System.user.permissions
-            && requestEnvelope.context.System.user.permissions.consentToken;
+        const consentToken = requestEnvelope.context.System.user.permissions &&
+            requestEnvelope.context.System.user.permissions.consentToken;
         if (!consentToken) {
             return responseBuilder
                 .speak(messages.NOTIFY_MISSING_PERMISSIONS)
@@ -53,14 +102,16 @@ const WhoseLandAmIOnIntentHandler = {
         try {
             const deviceId = requestEnvelope.context.System.device.deviceId;
             const accessToken = requestEnvelope.context.System.apiAccessToken;
-            const alexaURL = `https://api.amazonalexa.com/v1/devices/${deviceId}/settings/address/countryAndPostalCode`;
+            const url = `https://api.amazonalexa.com/v1/devices/${deviceId}/settings/address/countryAndPostalCode`;
 
-            const location = await axios.get(alexaURL, {
-                headers: { Authorization: 'Bearer ' + accessToken }
+            const location = await axios.get(url, {
+                headers: {
+                    Authorization: 'Bearer ' + accessToken
+                }
             });
 
             let response;
-            let LAND_MESSAGE;
+
             if (location.data.countryCode === null && location.data.postalCode === null) {
                 response = responseBuilder
                     .speak(messages.NO_ADDRESS)
@@ -72,10 +123,12 @@ const WhoseLandAmIOnIntentHandler = {
 
                 console.log('MAPS RESPONSE', mapsResponse)
 
-                const lat = mapsResponse.data.results[0].geometry.location.lat;
-                const lng = mapsResponse.data.results[0].geometry.location.lng;
+                const {
+                    lat,
+                    lng
+                } = mapsResponse.data.results[0].geometry.location;
 
-                console.log('LAT/LNG',lat, lng)
+                console.log('LAT/LNG', lat, lng)
 
                 const nativeLandURL = `https://native-land.ca/api/index.php?maps=territories&position=${lat},${lng}`;
                 const nativeLand = await axios.get(nativeLandURL);
@@ -83,7 +136,7 @@ const WhoseLandAmIOnIntentHandler = {
                 console.log('NL RESPONSE', nativeLand.data);
 
                 if (nativeLand.data.length === 1) {
-                    LAND_MESSAGE = `You are on the land of the ${nativeLand.data[0].properties.Name}.`;
+                    let LAND_MESSAGE = `You are on the land of the ${nativeLand.data[0].properties.Name}.`;
                 } else if (nativeLand.data.length > 1) {
                     const names = nativeLand.data.map(nationData => {
                         return nationData.properties.Name;
@@ -91,19 +144,18 @@ const WhoseLandAmIOnIntentHandler = {
                     const last = names.pop();
                     const nameString = names.join(', ')
 
-                    LAND_MESSAGE = `You are on the lands of the ${nameString}, and the ${last}.`
+                    let LAND_MESSAGE = `You are on the lands of the ${nameString}, and the ${last}.`;
+
+                    response = responseBuilder
+                        .speak(LAND_MESSAGE)
+                        .withSimpleCard('Native Land', LAND_MESSAGE)
+                        .getResponse();
                 } else if (nativeLand.data.length === 0) {
                     response = responseBuilder
                         .speak(messages.NL_LOCATION_FAILURE)
                         .withSimpleCard('Native Land', messages.NL_LOCATION_FAILURE)
                         .getResponse();
-                    return response;
                 }
-
-                response = responseBuilder
-                    .speak(LAND_MESSAGE)
-                    .withSimpleCard('Native Land', LAND_MESSAGE)
-                    .getResponse();
             }
             return response;
         } catch (error) {
@@ -136,9 +188,9 @@ const HelpIntentHandler = {
 
 const CancelAndStopIntentHAndler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
-                || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+            (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent' ||
+                handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
     },
     handle(handlerInput) {
         const speechText = messages.GOODBYE;
@@ -172,5 +224,6 @@ exports.handler = Alexa.SkillBuilders.custom()
         WhoseLandAmIOnIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHAndler,
-        SessionEndedRequestHandler
+        SessionEndedRequestHandler,
+        SSSMLIntentHandler
     ).lambda();
