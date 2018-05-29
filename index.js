@@ -27,16 +27,64 @@ const PERMISSIONS = ['read::alexa:device:all:address:country_and_postal_code'];
 const buildSSML = nlData => {
     let SSML;
 
-    const names = nlData.map(nation => {
-        if (IPA[nation.properties.Name]) {
-            return IPA[nation.properties.Name];
+    if (nlData.length === 1) {
+        const ph = IPA[nlData.nation.properties.Name];
+        let englishName;
+
+        for (let name of IPA) {
+            if (IPA[name] === ph) {
+                englishName = name;
+            }
         }
-    });
 
-    const last = names.pop();
-    const nameString = names.join(', ');
+        SSMl =  `
+            <speak>
+                You are on the land of the <phoneme alphabet="ipa" ph="${ph}">${englishName}</phoneme>
+            </speak>
+        `;
 
-    let LAND_MESSAGE = `You are on the lands of the ${nameString}, and the ${last}.`;
+    } else if (nlData.length > 1) {
+        const IPAnames = nlData.map(nation => {
+            if (IPA[nation.properties.Name]) {
+                return IPA[nation.properties.Name];
+            }
+        });
+
+        const lastIPA = IPAnames.pop();
+        let lastEnglishName;
+
+        for (let name of IPA) {
+            if (IPA[name] === lastIPA) {
+                lastEnglishName = name;
+            }
+        }
+
+        const phonemeStr = IPAnames.map(ph => {
+            let englishName;
+
+            for (let name of IPA) {
+                if (IPA[name] === ph) {
+                    englishName = name;
+                }
+            }
+
+            if (englishName) {
+                return `
+                    <phoneme alphabet="ipa" ph="${ph}">${englishName}</phoneme>
+                `
+            }
+        });
+
+        const nameString = phonemeStr.join(', ');
+
+        SSML = `
+            <speak>
+                You are on the lands of the ${nameString}, and the <phoneme alphabet="ipa" ph="${lastIPA}">${lastEnglishName}</phoneme>.
+            </speak>
+        `;
+    } else if (nlData.length === 0) {
+        SSML = NL_LOCATION_FAILURE;
+    }
 
     return SSML;
 }
@@ -135,27 +183,12 @@ const WhoseLandAmIOnIntentHandler = {
 
                 console.log('NL RESPONSE', nativeLand.data);
 
-                if (nativeLand.data.length === 1) {
-                    let LAND_MESSAGE = `You are on the land of the ${nativeLand.data[0].properties.Name}.`;
-                } else if (nativeLand.data.length > 1) {
-                    const names = nativeLand.data.map(nationData => {
-                        return nationData.properties.Name;
-                    });
-                    const last = names.pop();
-                    const nameString = names.join(', ')
+                const message = buildSSML(nativeLand.data);
 
-                    let LAND_MESSAGE = `You are on the lands of the ${nameString}, and the ${last}.`;
-
-                    response = responseBuilder
-                        .speak(LAND_MESSAGE)
-                        .withSimpleCard('Native Land', LAND_MESSAGE)
-                        .getResponse();
-                } else if (nativeLand.data.length === 0) {
-                    response = responseBuilder
-                        .speak(messages.NL_LOCATION_FAILURE)
-                        .withSimpleCard('Native Land', messages.NL_LOCATION_FAILURE)
-                        .getResponse();
-                }
+                response = responseBuilder
+                    .speak(message)
+                    .withSimpleCard('Native Land', message)
+                    .getResponse();
             }
             return response;
         } catch (error) {
