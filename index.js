@@ -3,91 +3,23 @@
 const Alexa = require('ask-sdk');
 const axios = require('axios');
 
-const messages = {
-    WELCOME: 'Welcome to Native Land!  You can find out which nation\'s land you are on by asking me whose land am I on.',
-    WHAT_DO_YOU_WANT: 'Ask me where you are by saying: where am I?',
-    NOTIFY_MISSING_PERMISSIONS: 'Please enable Location permissions in the Amazon Alexa app.',
-    NO_ADDRESS: 'It looks like you don\'t have an address set. You can set your address from the companion app.',
-    ERROR: 'Uh Oh. Looks like something went wrong.',
-    NL_LOCATION_FAILURE: 'There was an error with the Native Land Api. Please try again',
-    GOODBYE: 'Bye! Thanks for using the Sample Device Address API Skill!',
-    UNHANDLED: 'This skill doesn\'t support that. Please ask something else.',
-    HELP: 'You can use this skill by asking something like: whose land am I on?',
-    STOP: 'Bye! Thanks for using the Sample Device Address API Skill!',
-};
-
-const IPA = {
-    musqueam: 'xʷməθkʷəjˀəm',
-    tsleil_waututh: 'səl’ilwətaɁɬ',
-    squamish: '/ˈskwɔːmɪʃ/'
-};
+const messages = require('./data/messages.json');
+const IPA = require('./data/IPA.json');
+const utils = require('./utils');
 
 const PERMISSIONS = ['read::alexa:device:all:address:country_and_postal_code'];
 
-const buildSSML = nlData => {
-    let SSML;
+axios.interceptors.request.use(config => {
+    // Do something before request is sent
 
-    if (nlData.length === 1) {
-        const ph = IPA[nlData.nation.properties.Name];
-        let englishName;
+    console.log('REQUEST SENT -- METHOD: ' + config.method, config)
+    return config;
+}, error => {
+    // Do something with request error
+    return Promise.reject(error);
+});
 
-        for (let name of IPA) {
-            if (IPA[name] === ph) {
-                englishName = name;
-            }
-        }
-
-        SSMl =  `
-            <speak>
-                You are on the land of the <phoneme alphabet="ipa" ph="${ph}">${englishName}</phoneme>
-            </speak>
-        `;
-
-    } else if (nlData.length > 1) {
-        const IPAnames = nlData.map(nation => {
-            if (IPA[nation.properties.Name]) {
-                return IPA[nation.properties.Name];
-            }
-        });
-
-        const lastIPA = IPAnames.pop();
-        let lastEnglishName;
-
-        for (let name of IPA) {
-            if (IPA[name] === lastIPA) {
-                lastEnglishName = name;
-            }
-        }
-
-        const phonemeStr = IPAnames.map(ph => {
-            let englishName;
-
-            for (let name of IPA) {
-                if (IPA[name] === ph) {
-                    englishName = name;
-                }
-            }
-
-            if (englishName) {
-                return `
-                    <phoneme alphabet="ipa" ph="${ph}">${englishName}</phoneme>
-                `
-            }
-        });
-
-        const nameString = phonemeStr.join(', ');
-
-        SSML = `
-            <speak>
-                You are on the lands of the ${nameString}, and the <phoneme alphabet="ipa" ph="${lastIPA}">${lastEnglishName}</phoneme>.
-            </speak>
-        `;
-    } else if (nlData.length === 0) {
-        SSML = NL_LOCATION_FAILURE;
-    }
-
-    return SSML;
-}
+/* Handlers */
 
 const SSSMLIntentHandler = {
     canHandle(handlerInput) {
@@ -102,6 +34,12 @@ const SSSMLIntentHandler = {
             `<speak>
                 You are on the land of the <phoneme alphabet="ipa" ph="${IPA.squamish}">Squamish</phoneme>
             </speak>`;
+
+        // `<speak>
+        //     Lets learn some Ditidaht! <phoneme alphabet="ipa" ph="čačabax̣">čačabax̣</phoneme>,
+        //                               <phoneme alphabet="ipa" ph="ʔuuquubs">ʔuuquubs</phoneme>,
+        //                               <phoneme alphabet="ipa" ph="šu">šu</phoneme>
+        // </speak>`;
 
         return handlerInput.responseBuilder
             .speak(SPEECH)
@@ -138,8 +76,7 @@ const WhoseLandAmIOnIntentHandler = {
             responseBuilder
         } = handlerInput;
 
-        const consentToken = requestEnvelope.context.System.user.permissions &&
-            requestEnvelope.context.System.user.permissions.consentToken;
+        const consentToken = requestEnvelope.context.System.user.permissions && requestEnvelope.context.System.user.permissions.consentToken;
         if (!consentToken) {
             return responseBuilder
                 .speak(messages.NOTIFY_MISSING_PERMISSIONS)
@@ -148,8 +85,15 @@ const WhoseLandAmIOnIntentHandler = {
         }
 
         try {
+            utils.sendProgressiveResponse(requestEnvelope);
+        } catch (err) {
+            console.log(err.message)
+        }
+
+        try {
             const deviceId = requestEnvelope.context.System.device.deviceId;
             const accessToken = requestEnvelope.context.System.apiAccessToken;
+
             const url = `https://api.amazonalexa.com/v1/devices/${deviceId}/settings/address/countryAndPostalCode`;
 
             const location = await axios.get(url, {
@@ -183,7 +127,7 @@ const WhoseLandAmIOnIntentHandler = {
 
                 console.log('NL RESPONSE', nativeLand.data);
 
-                const message = buildSSML(nativeLand.data);
+                const message = utils.buildSSML(nativeLand.data);
 
                 response = responseBuilder
                     .speak(message)
