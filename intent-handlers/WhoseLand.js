@@ -60,7 +60,7 @@ const WhoseLandAmIOnIntentHandler = {
 
             let response;
 
-            if (location.data.countryCode === null && location.data.postalCode === null) {
+            if (!location.data.countryCode && !location.data.postalCode) {
                 response = responseBuilder
                     .speak(messages.NO_ADDRESS)
                     .withSimpleCard('Native Land', messages.NO_ADDRESS)
