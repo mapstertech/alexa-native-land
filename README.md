@@ -100,6 +100,15 @@ We will need permission to:
 
 ![configure country and postal code](./screenshots/configure-permissions-country-and-postal-code.png)
 
+
+### Device Location
+Device Location can be changed from the Alexa app or from the [web app](https://alexa.amazon.ca/).
+
+#### Web app
+
+![configure device location](./screenshots/device-location.png)
+
+
 ### Next steps
 1. Save the model!! *VERY IMPORTANT*. You will lose your changes if you do not save.
 
