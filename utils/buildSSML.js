@@ -12,9 +12,12 @@ const buildSSML = nlData => {
             let name;
 
             for (let data of IPA) {
-                if (data.slug === nlData[0].properties.Slug) {
+                if (data.slug === nlData[0].properties.Slug && data.IPA) {
                     ph = data.IPA;
                     name = data.name;
+                } else {
+                    // No IPA data found build standard response
+                    return null;
                 }
             }
 

@@ -1,7 +1,8 @@
 /* WhoseLand.js */
 
 const axios = require('axios');
-const message = require('../data/messages.json');
+const messages = require('../data/messages.json');
+const cards = require('../data/cards.json');
 const utils = require('../utils');
 
 const PERMISSIONS = ['read::alexa:device:all:address:country_and_postal_code'];
@@ -63,7 +64,7 @@ const WhoseLandAmIOnIntentHandler = {
             if (!location.data.countryCode && !location.data.postalCode) {
                 response = responseBuilder
                     .speak(messages.NO_ADDRESS)
-                    .withSimpleCard('Native Land', messages.NO_ADDRESS)
+                    .withSimpleCard('Native Land', cards.NO_ADDRESS)
                     .getResponse();
             } else {
                 const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?components=country:${location.data.countryCode}|postal_code:${location.data.postalCode}&key=${process.env.MAPS_API_KEY}`;
@@ -83,12 +84,16 @@ const WhoseLandAmIOnIntentHandler = {
 
                 console.log('NL RESPONSE', nativeLand.data);
 
-                const message = utils.buildSSML(nativeLand.data);
+                let message = utils.buildSSML(nativeLand.data);
+
+                if (!message) {
+                    message = utils.buildStandardResponse(nativeLand.data);
+                }
 
                 response = responseBuilder
-                    .speak(message)
-                    .withSimpleCard('Native Land', message)
-                    .getResponse();
+                .speak(message)
+                .withSimpleCard('Native Land', message)
+                .getResponse();
             }
             return response;
         } catch (error) {
