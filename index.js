@@ -13,6 +13,7 @@ if (DEV) {
 
         return config;
     }, error => {
+        console.log(errror)
         // Do something with request error
         return Promise.reject(error);
     });
