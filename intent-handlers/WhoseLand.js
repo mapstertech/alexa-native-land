@@ -86,6 +86,8 @@ const WhoseLandAmIOnIntentHandler = {
                 console.log('NL RESPONSE', nativeLand.data);
 
                 let message = utils.buildSSML(nativeLand.data);
+                let card = cards.DEFAULT;
+                console.log(card)
 
                 if (!message) {
                     message = utils.buildStandardResponse(nativeLand.data);
@@ -93,7 +95,7 @@ const WhoseLandAmIOnIntentHandler = {
 
                 response = responseBuilder
                 .speak(message)
-                .withSimpleCard('Native Land', message)
+                .withSimpleCard('Native Land', card)
                 .getResponse();
             }
             return response;
