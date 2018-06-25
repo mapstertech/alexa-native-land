@@ -11,7 +11,6 @@ const PERMISSIONS = ['read::alexa:device:all:address:country_and_postal_code'];
 
 const WhoseLandAmIOnIntentHandler = {
     canHandle(handlerInput) {
-        console.log('handlerInput', handlerInput)
         const { request } = handlerInput.requestEnvelope;
 
         return request.type === 'IntentRequest' && request.intent.name === 'WhoseLandIntent';

@@ -4,9 +4,10 @@
     "NOTIFY_MISSING_PERMISSIONS": "Please enable Location permissions in the Amazon Alexa app.",
     "NO_ADDRESS": "It looks like you don't have an address set on your device. You can set your address from the Alexa app, or from the alexa dashboard online",
     "ERROR": "Uh Oh. Looks like something went wrong.",
-    "NL_LOCATION_FAILURE": "There was an error with the Native Land Api. Please try again",
-    "GOODBYE": "Bye! Thanks for using the Sample Device Address API Skill!",
+    "NL_LOCATION_FAILURE": "There was an error with Native Land. Please try again later",
+    "GOODBYE": "Bye! Thanks for using Native Land!",
     "UNHANDLED": "This skill doesn't support that. Please ask something else.",
     "HELP": "You can use this skill by asking something like: whose land am I on?",
-    "STOP": "Bye! Thanks for using Native Land"
+    "STOP": "Bye! Thanks for using Native Land",
+    "FALLBACK": "I'm sorry, I don't know that question. Please ask something else like: whose land am I on?"
 }
